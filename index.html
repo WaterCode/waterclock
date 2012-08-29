@@ -1,0 +1,369 @@
+<!DOCTYPE>
+<html>
+	<head>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0, user-scalable=no" />
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="webkit-ipad-retina-precomposed.png" />
+		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="webkit-ipad-precomposed.png" />
+		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="webkit-iphone-retina-precomposed.png" />
+		<link rel="apple-touch-icon-precomposed" sizes="57x57" href="webkit-iphone-precomposed.png" />
+		<!-- iPhone -->
+<link rel="apple-touch-startup-image"
+      media="(device-width: 320px)"
+      href="apple-touch-startup-image-320x460.png">
+<!-- iPhone (Retina) -->
+<link rel="apple-touch-startup-image"
+      media="(device-width: 320px)
+         and (-webkit-device-pixel-ratio: 2)"
+      href="apple-touch-startup-image-640x920.png">
+	  <!-- iPad (portrait) -->
+<link rel="apple-touch-startup-image"
+      media="(device-width: 768px)
+         and (orientation: portrait)"
+      href="apple-touch-startup-image-768x1004.png">
+<!-- iPad (landscape) -->
+<link rel="apple-touch-startup-image"
+      media="(device-width: 768px)
+         and (orientation: landscape)"
+      href="apple-touch-startup-image-748x1024.png">
+<!-- iPad (Retina, portrait) -->
+<link rel="apple-touch-startup-image"
+      media="(device-width: 768px)
+         and (orientation: portrait)
+         and (-webkit-device-pixel-ratio: 2)"
+      href="apple-touch-startup-image-1536x2008.png">
+<!-- iPad (Retina, landscape) -->
+<link rel="apple-touch-startup-image"
+      media="(device-width: 768px)
+         and (orientation: landscape)
+         and (-webkit-device-pixel-ratio: 2)"
+      href="apple-touch-startup-image-1496x2048.png">
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+		<link href='css/style.css' rel='stylesheet' type='text/css'>
+		<link href='css/font-awesome.css' rel='stylesheet' type='text/css'>
+		<title>Clock+Weather</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+		<script src="js/retina.js" type="text/javascript"></script>
+		<script src="js/jquery.cookie.js" type="text/javascript"></script>
+		<script src="js/cookies.js" type="text/javascript"></script>
+		<script src="js/clock.js" type="text/javascript"></script>
+		<script src="js/location.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			
+			
+			$(document).ready(function() {
+				// left: 37, up: 38, right: 39, down: 40,
+				// spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+				var keys = [37, 38, 39, 40];
+				var cookieTheme;
+				function preventDefault(e) {
+					e = e || window.event;
+  					if (e.preventDefault)
+      					e.preventDefault();
+  					e.returnValue = false;  
+				}
+
+				function keydown(e) {
+					for (var i = keys.length; i--;) {
+						if (e.keyCode === keys[i]) {
+							preventDefault(e);
+							return;
+						}
+					}
+				}
+
+				function wheel(e) {
+					preventDefault(e);
+				}
+
+				function disable_scroll() {
+					if (window.addEventListener) {
+						window.addEventListener('DOMMouseScroll', wheel, false);
+					}
+					$(document).bind('touchmove', function(e) {
+						e.preventDefault();
+					});
+					window.onmousewheel = document.onmousewheel = wheel;
+					document.onkeydown = keydown;
+				}
+
+				function enable_scroll() {
+					if (window.removeEventListener) {
+						window.removeEventListener('DOMMouseScroll', wheel, false);
+					}
+					window.onmousewheel = document.onmousewheel = document.onkeydown = null;  
+				}
+				disable_scroll();
+				$('.icon-cog').click(function() {
+						$('html, body').animate({
+							scrollTop: $('.settingsPanel').offset().top
+						}, 1000, function(){
+								
+							}
+						);
+
+				});
+				$('.icon-refresh').click(function() {
+					refreshWeather();
+				});
+				
+				$('.icon-home').click(function() {
+						
+						$('html, body').animate({
+							scrollTop: $('.mainpage').offset().top
+						}, 1000, function(){
+								
+							}
+						);
+								
+
+					});
+				function getURLParameter(name) {
+					return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+				}
+				function startApp() {
+					
+					var clockTimer = window.setInterval( function() {
+						clock();
+					},1000);
+					var weatherTimer = window.setInterval( function() {
+						refreshWeather();
+					},900000);
+					
+					var cookieTheme = $.cookie('cookieTheme');
+					if(cookieTheme == null){
+						$.cookie('cookieTheme', '1', { expires: 365 * 10 });
+						cookieTheme = $.cookie('cookieTheme');
+						
+					}else{
+						
+					}
+					var cookieTime = $.cookie('cookieTime');
+					if(cookieTime == null){
+						$.cookie('cookieTime', '0', { expires: 365 * 10 });
+						cookieTime = $.cookie('cookieTime');
+						
+					}else{
+						
+					}
+					var woeid = $.cookie('woeid');
+					if(woeid == null){
+						$.cookie('woeid', '44418', { expires: 365 * 10 });
+						woeid = $.cookie('woeid');
+						
+					}else{
+						
+					}
+					var utcOffset = $.cookie('utcOffset');
+					if(utcOffset == null){
+						$.cookie('utcOffset', '0', { expires: 365 * 10 });
+						utcOffset = $.cookie('utcOffset');
+						
+					}else{
+						
+					}
+					var dsaving = $.cookie('dsaving');
+					if(dsaving == null){
+						$.cookie('dsaving', '0', { expires: 365 * 10 });
+						dsaving = $.cookie('dsaving');
+						
+					}else{
+						
+					}
+					var tempdeg = $.cookie('tempdeg');
+					if(tempdeg == null){
+						$.cookie('tempdeg', '0', { expires: 365 * 10 });
+						tempdeg = $.cookie('tempdeg');
+						
+					}else{
+						
+					}
+					var version = "1.0";
+					var versionText = [ 
+						'World clock (location can be changed in settings)', 
+						'Weather',
+						'Note: when switching to Central Park theme, the background can take a while to download' 
+					]; 
+					var currentVersion = $.cookie('currentVersion');
+					if(currentVersion == null){
+						var alertText = 'Welcome to WaterClock\nWhat\'s in version ' + version;
+						jQuery.each(versionText, function() {
+							alertText = alertText + '\n' + this;
+						});
+						alert(alertText);
+						$.cookie('currentVersion', version, { expires: 365 * 10 });
+						currentVersion = $.cookie('currentVersion');
+						
+					}if(currentVersion != version){
+						var alertText = 'New Update!\nWhat\'s in version ' + version;
+						jQuery.each(versionText, function() {
+							alertText = alertText + '\n' + this;
+						});
+						alert(alertText);
+						$.removeCookie(version);
+						$.cookie('currentVersion', version, { expires: 365 * 10 });
+						currentVersion = $.cookie('currentVersion');
+					}
+					refreshWeatherfirst();
+					
+					
+				}
+				
+					
+					var isiPad = false;
+					if($.browser.webkit || navigator.userAgent.match(/iPad/i) != null){
+						isiPad = true;
+					}
+						if(isiPad == false){
+							$('.notcompatible').show();
+							$('.cookiemsg').hide();
+						}
+					$('.hideButton').click(function() {
+						$(this).parent().slideUp();
+					});
+					$('.hideButtonOrange').click(function() {
+						$(this).parent().slideUp();
+					});
+				if(getURLParameter('cookie') == 'yes') {
+					$('.cookiemsg').hide();
+					$('.guide').hide();
+    					
+							if (window.navigator.userAgent.indexOf('iPad') != -1) {
+								if (window.navigator.standalone == true) {
+									startApp();
+								} else {
+									$('.loading').hide();
+									$('.guide').show();
+								};
+								} else {
+									if(isiPad == true){
+										startApp();
+									}
+								};
+						if(getURLParameter('force') == 'ipad') {
+							$('.notcompatible').hide();
+							$('.cookiemsg').hide();
+							startApp();
+						}
+				}else{
+					$('.loading').hide();
+					$('.beta').slideDown('slow');
+					$('.cookiemsg').show();
+					
+						if(isiPad == false){
+							$('.notcompatible').show();
+							$('.cookiemsg').hide();
+						}
+				}
+				
+				
+			});
+		</script>
+	</head>
+	<body ontouchstart="">
+	<img src="" class="loader" style="display:none;"/>
+	<div class="loading" style="text-align:center;">Loading...</div>
+		<div class="notcompatible">
+			<span class="icon-remove-circle largeCircle"></span><br>
+			This webapp has been developed for use with iPad&reg; & WebKit browsers and has not been tested for other platforms. If you are using IE to visit our site, we recommend that you get a <a href="https://www.google.com/intl/en/chrome/browser/">proper browser</a>. To contact us, please visit our website at <a href="http://www.bit.ly/watercode">bit.ly/watercode</a> (iPad&reg; is a trademark of Apple Inc.)
+		</div>
+		<div class="cookiemsg">
+			Clock + Weather Webapp Installation<br>
+			<br>
+			This webapp uses cookies to save your settings inside the webapp.<br>
+			By pressing I agree, you agree that Clock + Weather can use cookies to save my settings (user preferences)
+			<br><br><br>
+			<a href="?cookie=yes" class="cookiebutton">I agree</a> <a href="http://www.google.com/" class="cookiebutton">I disagree</a><br>
+			<br>
+		</div>
+		<div class="guide">
+			Installing the webapp<br>
+			<br>
+			Open this page in safari and press the share button (looks like <span class="icon-share"></span>) and press 'Add to Home Screen'
+		</div>
+		<table class="mainpage">
+			<tr class="row">
+				<td class="cell weather">|</td>
+				<td class="cell time right"><span id="hour"></span><span class="colon" style="display:none;">:</span><span id="mins"></span></td>
+			</tr>
+			<tr class="row">
+				<td class="cell"><span class="temp"></span><br><span class="smaller info"></span></td>
+				<td class="cell smaller right" rowspan="2" valign="bottom"><span id="day"></span> <span id="daynum"></span> <span id="month"></span><br><span id="year"></span></td>
+			</tr>
+			<tr class="row">
+				<td class="cell smaller" id="location" valign="bottom"></td>
+			</tr>
+			<tr class="row">
+				<td class="footer" colspan="2"><span class="icon-refresh"></span><span class="icon-cog"></span></td>
+			</tr>
+		</table>
+		<table class="settingsPanel">
+			<tr class="settingsPanelHeader"><td><span class="icon-home"></span></td></tr>
+			<tr class="settingsPanelTitle"><td>Settings</td></tr>
+			<tr><td style="text-align:center;">
+				Theme <select onchange="newtheme(this.selectedIndex)" id="dropTheme">
+					<option selected="selected">Blue</option>
+					<option>Grey</option>
+					<option>Central Park</option>
+				</select>
+				<br>
+				Auto-update weather every <select onchange="weatherTimerUpdate(this.value, this.selectedIndex)" class="autoTime">
+					<option>Off</option>
+					<option>1</option>
+					<option>5</option>
+					<option>10</option>
+					<option selected="selected">15</option>
+					<option>30</option>
+				</select> minutes<br>
+				Location <input type="text" class="locationbox" /><button onclick="getlocation()">Search</button><br><span class="currentlocation"></span><br>
+				Daylight Saving <select onchange="dsaving(this.selectedIndex)" id="dsavingbox">
+					<option selected="selected">Off</option>
+					<option>On</option>
+				</select>
+				<br>
+				&deg;<select onchange="tempdeg(this.selectedIndex)" id="tempdegbox">
+					<option selected="selected">C</option>
+					<option>F</option>
+				</select><br>
+				
+				
+				<table style="width:600px; margin-left:auto; margin-right:auto;">
+				<tr>
+				<td style="text-align:right; width:300px;">
+				<button onclick="$('#box1').slideToggle();">About Us & Credits</button>
+				</td>
+				<td style="width:300px;">
+				<button onclick="$('#box2').slideToggle();">Version History</button>
+				</td>
+				</tr>
+				<tr>
+				<td style="width:300px;">
+				<div class="square" id="box1">
+					WaterClock is made by  who WaterCode make webapps - <a href="http://watercode.github.com">website</a><br>
+					We would like to thank:<br>
+					<a href="http://adamwhitcroft.com/climacons/">Climacons</a><br>
+					<a href="http://fortawesome.github.com/Font-Awesome">Font-awesome</a><br>
+					<a href="https://github.com/carhartl/jquery-cookie">carhartl's jquery cookie plugin</a><br>
+					<a href="http://developer.yahoo.com/">Yahoo! Developer Network</a><br>
+					<a href="http://weather.yahoo.com">Yahoo! Weather</a><br>
+				</div>
+				</td>
+				<td style="width:300px;">
+				<div class="square" id="box2">
+					<b>1.0</b><br>
+					<ul>
+					<li>World clock (location can be changed in settings)</li>
+					<li>Weather</li>
+					</ul>
+				</div>
+				</td>
+				</tr>
+				</table>
+				</td></tr>
+			<tr><td style="text-align:center;">
+			This poll will be removed after a sufficient amount of results, and it will decide if this webapp should continue to be developed<br><div style="margin-left:auto; margin-right:auto; width:302px;"><script type="text/javascript" charset="utf-8" src="http://static.polldaddy.com/p/6496182.js"></script>
+<noscript><a href="http://polldaddy.com/poll/6496182/">Do you like this app?</a></noscript></div>
+			<br>Weather provided by Yahoo! Weather<br><button onclick="deleteAllCookies()">Delete Cookies</button></td></tr>
+		</table>
+	</body>
+</html>
