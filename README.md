@@ -1,6 +1,20 @@
-waterclock
-==========
+## waterclock
+a weather webapp for iPad
 
-A weather webapp designed for iPad, created in the times before responsive web design
+![Waterclock Logo](webkit-ipad-retina-precomposed.png)
 
-NOTE: This repo is no longer being maintained and no more updates are planned
+## Description
+
+Waterclock is a weather webapp for iPad which uses the Yahoo API to get weather data.
+
+## Requirements
+
+* iPad
+
+## Installation
+
+1. Open index.html
+
+## License
+
+Waterclock is licensed under GPL v2 and this can be found in LICENSE.txt
